@@ -8,8 +8,8 @@ import {IERC4907X} from "./IERC4907.sol";
 contract RentalNFT is ERC1155, IERC4907X {
 
     struct UserServiceInfo {
-        address user;   // address of user role
-        uint64 expires; // unix timestamp, user service expires
+        address feeToken;   // token for service charge
+        uint64 expires;     // unix timestamp, user service expires
     }
 
     struct ServiceInfo {
@@ -32,7 +32,7 @@ contract RentalNFT is ERC1155, IERC4907X {
     mapping(address => bool) public feeTokens;
 
     /// @dev user info of service NFT
-    mapping(uint256 => UserServiceInfo) internal _users;
+    mapping(uint256 => mapping(address => UserServiceInfo)) internal _users;
 
 
     /// RentalNFT: EVENTS
@@ -51,11 +51,12 @@ contract RentalNFT is ERC1155, IERC4907X {
     error InsufficientBalance(uint256 balance, uint256 serviceCost);
     error InvalidRentalTime();
     error AlreadyMinted(uint256 serviceId);
+    error NoUserForService(uint256 serviceId);
 
 
     constructor(
-        string memory uri_,
         address _admin,
+        string memory uri_,
         ServiceInfo[] memory _services
     ) ERC1155(uri_) {
 
@@ -77,11 +78,7 @@ contract RentalNFT is ERC1155, IERC4907X {
         uint256 _serviceId,
         address _feeToken,
         uint256 _rentAmount
-    ) isValidService(_serviceId)external {
-
-        if(!feeTokens[_feeToken]) {
-            revert UnsupportedToken(_feeToken);
-        }
+    ) isValidService(_serviceId) isSupportedToken(_feeToken) external {
 
         // transfer fee to admin
         uint256 serviceCost = services[_serviceId].fee * (10 ** IERC20(_feeToken).decimals()) / _DECIMALS;
@@ -109,17 +106,70 @@ contract RentalNFT is ERC1155, IERC4907X {
 
         // add user for service and emit service rented event
         uint64 expires = uint64(block.timestamp + hrsToRent * 3600);
-        _users[_serviceId] = UserServiceInfo(msg.sender, expires);
+        _users[_serviceId][msg.sender] = UserServiceInfo(_feeToken, expires);
 
         emit ServiceApproved(_serviceId, msg.sender, expires);
     }
 
-    function extendService(uint256 _serviceId) isValidService(_serviceId) external {
+    ///@dev prolong the lifetime of a service.
+    ///@notice if the service is expired, the new expirytime will start from now, otherwise old expirytime is extended.
+    function extendService(
+        uint256 _serviceId,
+        address _feeToken,
+        uint64 _hrs
+    ) isValidService(_serviceId) isSupportedToken(_feeToken) external {
+        UserServiceInfo storage _userInfo = _users[_serviceId][msg.sender];
+        uint64 expiryTime = _userInfo.expires;
 
+        // ensure to extend for same token used to rent service.
+        if(_userInfo.feeToken != _feeToken) {
+            revert NoUserForService(_serviceId);
+        }
+
+        uint256 serviceCost = services[_serviceId].fee * (10 ** IERC20(_feeToken).decimals()) / _DECIMALS;
+        uint256 extensionFee = serviceCost * _hrs;
+        uint256 userBalance = IERC20(_feeToken).balanceOf(msg.sender);
+
+        if(userBalance < extensionFee) {
+            revert InsufficientBalance(userBalance, extensionFee);
+        }
+
+        // charge user for service, increase expiry time and emit service event
+        IERC20(_feeToken).transferFrom(msg.sender, admin, extensionFee);
+
+        if(expiryTime < block.timestamp) {
+            expiryTime = uint64(block.timestamp);
+        }
+
+        _userInfo.expires = uint64(expiryTime + _hrs * 3600);
+
+        emit ServiceApproved(_serviceId, msg.sender, expiryTime);
     }
 
-    function endService(uint256 _serviceId) external {
 
+    ///@dev end the lifetime of a service with possible refund
+    function endService(
+        uint256 _serviceId,
+        address _feeToken
+    ) external isValidService(_serviceId) isSupportedToken(_feeToken) {
+        UserServiceInfo storage serviceInfo = _users[_serviceId][msg.sender];
+        uint64 expiryTime = serviceInfo.expires;
+
+        if(expiryTime <= block.timestamp) {
+            revert NoUserForService(_serviceId);
+        }
+
+        uint64 unusedHrs = uint64((expiryTime - block.timestamp) / 3600);
+
+        uint256 serviceCost = services[_serviceId].fee * (10 ** IERC20(_feeToken).decimals()) / _DECIMALS;
+
+        uint256 refund = unusedHrs * serviceCost;
+
+        IERC20(_feeToken).transferFrom(admin, msg.sender, refund);
+
+        serviceInfo.expires = 0;
+
+        emit ServiceApproved(_serviceId, msg.sender, 0);
     }
 
     /// @dev add support for a new fee token
@@ -134,42 +184,17 @@ contract RentalNFT is ERC1155, IERC4907X {
         services[serviceCount] = info;
         emit ServiveAdded(serviceCount++, info.name);
     }
-    
-    /// @notice set the user and expires of an NFT
-    /// @dev The zero address indicates there is no user
-    /// Throws if `tokenId` is not valid NFT
-    /// @param user  The new user of the NFT
-    /// @param expires  UNIX timestamp, The new user could use the NFT before expires
 
-    /// ==================I AM NOT SURE WE NEED THIS LOGIC================
-    // function setUser(uint256 tokenId, address user, uint64 expires) public virtual {
-    //     // require(_isApprovedOrOwner(msg.sender, tokenId), "ERC4907: transfer caller is not admin nor approved");
-    //     require(isApprovedForAll(user, msg.sender), "ERC4907: transfer caller is not admin nor approved");
-    //     UserServiceInfo storage info =  _users[tokenId];
-    //     info.user = user;
-    //     info.expires = expires;
-    //     emit UpdateUser(tokenId, user, expires);
-    // }
-
-    /// @notice Get the user address of an NFT
-    /// @dev The zero address indicates that there is no user or the user is expired
-    /// @param tokenId The NFT to get the user address for
-    /// @return The user address for this NFT
-    function userOf(uint256 tokenId) public view virtual returns(address) {
-        if( uint256(_users[tokenId].expires) >=  block.timestamp){
-            return  _users[tokenId].user;
-        }
-        else{
-            return address(0);
-        }
+    function userInfo(uint256 tokenId, address _user) public view virtual returns(UserServiceInfo memory info) {
+        info = _users[tokenId][_user];
     }
 
     /// @notice Get the user expires of an NFT
     /// @dev The zero value indicates that there is no user
     /// @param tokenId The NFT to get the user expires for
     /// @return The user expires for this NFT
-    function userExpires(uint256 tokenId) public view virtual returns(uint256) {
-        return _users[tokenId].expires;
+    function userExpires(uint256 tokenId, address _user) public view virtual returns(uint256) {
+        return _users[tokenId][_user].expires;
     }
 
     /// @dev See {IERC165-supportsInterface}.
@@ -197,8 +222,8 @@ contract RentalNFT is ERC1155, IERC4907X {
             data);
 
         // clear user info if NFT is transferred
-        if (from != to && _users[tokenIds[0]].user != address(0)) {
-            delete _users[tokenIds[0]];
+        if (from != to && _users[tokenIds[0]][from].feeToken != address(0)) {
+            delete _users[tokenIds[0]][from];
             emit UpdateUser(tokenIds[0], address(0), 0);
         }
     }
@@ -212,7 +237,9 @@ contract RentalNFT is ERC1155, IERC4907X {
         return array;
     }
 
-    // modifier
+
+    // RentalNFT: MODIFIERS
+
     modifier onlyAdmin() {
         if(msg.sender != admin) {
             revert NotAdmin();
@@ -223,6 +250,13 @@ contract RentalNFT is ERC1155, IERC4907X {
     modifier isValidService(uint256 _serviceId) {
         if(_serviceId >= serviceCount) {
             revert UnsupportedService(_serviceId);
+        }
+        _;
+    }
+
+    modifier isSupportedToken(address _feeToken) {
+        if(!feeTokens[_feeToken] || _feeToken == address(0)) {
+            revert UnsupportedToken(_feeToken);
         }
         _;
     }
