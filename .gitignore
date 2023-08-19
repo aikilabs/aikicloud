@@ -36,3 +36,5 @@ next-env.d.ts
 
 # contracts
 /contracts/lib
+/contracts/cache
+/contracts/out
