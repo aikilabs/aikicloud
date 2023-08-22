@@ -39,7 +39,13 @@ contract RentalNFT is ERC1155, IERC4907X {
     event FeeTokenAdded(IERC20 indexed token, uint256 addedAt);
 
     /// @dev service rented
-    event ServiceApproved(uint256 indexed serviceId, address indexed user, uint256 expires);
+    event ServiceRented(uint256 indexed serviceId, address indexed user, uint256 expires);
+
+    /// @dev service extended
+    event ServiceExtended(uint256 indexed serviceId, address indexed user, uint256 hrsToExtendInSecs);
+
+    /// @dev service stopped
+    event ServiceStopped(uint256 indexed serviceId, address indexed user, uint256 zeroTime);
 
 
     /// RentalNFT: ERROR MESSAGES
@@ -121,7 +127,7 @@ contract RentalNFT is ERC1155, IERC4907X {
         uint64 expires = uint64(block.timestamp + (hrsToRent * 3600));
         _users[_serviceId][msg.sender] = IERC4907X.UserServiceInfo(address(_feeToken), expires);
 
-        emit ServiceApproved(_serviceId, msg.sender, expires);
+        emit ServiceRented(_serviceId, msg.sender, expires);
 
         rented_ = true;
     }
@@ -160,9 +166,10 @@ contract RentalNFT is ERC1155, IERC4907X {
             _userInfo.expires = uint64(block.timestamp);
         }
 
-        _userInfo.expires = uint64(_userInfo.expires)  + uint64(_hrs * 3600);
+        uint64 hrsToExtendInSecs = uint64(_hrs * 3600);
+        _userInfo.expires = uint64(_userInfo.expires)  + hrsToExtendInSecs;
 
-        emit ServiceApproved(_serviceId, msg.sender, expiryTime);
+        emit ServiceExtended(_serviceId, msg.sender, hrsToExtendInSecs);
 
         extended_ = true;
     }
@@ -190,7 +197,7 @@ contract RentalNFT is ERC1155, IERC4907X {
 
         serviceInfo.expires = 0;
 
-        emit ServiceApproved(serviceId_, msg.sender, 0);
+        emit ServiceStopped(serviceId_, msg.sender, 0);
 
         ended_ = true;
     }

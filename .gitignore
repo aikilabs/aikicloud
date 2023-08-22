@@ -38,3 +38,6 @@ next-env.d.ts
 /contracts/lib
 /contracts/cache
 /contracts/out
+
+# env files
+**/*env
