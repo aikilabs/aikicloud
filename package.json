@@ -1,4 +1,12 @@
 {
   "private": true,
-  "workspaces": ["ui", "backend", "contracts"]
+  "workspaces": [
+    "ui",
+    "backend",
+    "contracts",
+    "tenderly_actions"
+  ],
+  "dependencies": {
+    "@tenderly/actions-test": "^0.2.3"
+  }
 }

@@ -1,0 +1,49 @@
+account_id: ""
+actions:
+  nuel/aikicloud:
+    runtime: v2
+    sources: actions
+    specs:
+      apiCall:
+        description: Send request to the backend cloud provisioning API on contract event.
+        function: api_call:callBackendApi
+        trigger:
+          type: transaction
+          transaction:
+            status:
+              - mined # transaction should in a mined block
+            filters:
+              # emitted events with logs of interest (works for unverified contracts)
+              - network: 80001
+                status: success
+                logEmitted:
+                  contract:
+                    address: 0x8f7686c693Cfa3410fF23934F05050f32a421C9d
+                  startsWith:
+                    # log topics for `ServiceRented`, `ServiceExtended` and `ServiceStopped` events respectively
+                    - 0xdc39e1687a25985cbc0c627c5b94c2f37b7d7b2a3697237b18202259c267afb8
+                    - 0x212dd7fa4d9bd5706dcf4975eb05bd4cb9d5e3b58d80ae091b620c4fd9de7152
+                    - 0x34b5c9f1c18f9a2fb16b18979fd017991f22dcb8582b323ce4d180047d99c771
+              # emitted events of interest
+              - network: 80001
+                status: success
+                eventEmitted:
+                  contract:
+                    address: 0x8f7686c693Cfa3410fF23934F05050f32a421C9d
+                  name: ServiceRented
+              - network: 80001
+                status: success
+                eventEmitted:
+                  contract:
+                    address: 0x8f7686c693Cfa3410fF23934F05050f32a421C9d
+                  name: ServiceExtended
+              - network: 80001
+                status: success
+                eventEmitted:
+                  contract:
+                    address: 0x8f7686c693Cfa3410fF23934F05050f32a421C9d
+                  name: ServiceStopped
+
+        execution_type: sequential
+project_slug: ""
+

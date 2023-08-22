@@ -1,0 +1,7 @@
+{
+    "events": {
+        "ServiceRented": "0xdc39e1687a25985cbc0c627c5b94c2f37b7d7b2a3697237b18202259c267afb8",
+        "ServiceExtended": "0x212dd7fa4d9bd5706dcf4975eb05bd4cb9d5e3b58d80ae091b620c4fd9de7152",
+        "ServiceStopped": "0x34b5c9f1c18f9a2fb16b18979fd017991f22dcb8582b323ce4d180047d99c771"
+    }
+}
