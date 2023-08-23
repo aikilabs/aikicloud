@@ -5,13 +5,13 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 
+
 // const multer = require("multer");
 // const upload = multer({ dest: "uploads/" });
 
 // Import Express
 const express = require("express");
 const app = express();
-
 
 // ######################################################################################################
 // ######################################################################################################
@@ -42,12 +42,15 @@ app.use(morgan("dev"));
 app.get(
     "/",
     // upload.array("photos"),
-    (req, res) => {
+    async (req, res) => {
         console.log({ files: req.files, body: req.body });
         res.json({ msg: "Welcome To AikiCloud" });
     }
 );
 
+// VM ROUTES
+const vmRoutes = require("./routes/vm");
+app.use("/api/vm", vmRoutes);
 
 // ######################################################################################################
 // ######################################################################################################
@@ -67,7 +70,6 @@ app.use(errorHandler);
 const port = process.env.PORT || 5000;
 const serverApp = async () => {
     try {
-        await connectToMongodb();
         app.listen(port, () => console.log(`Server listening on port ${port}`));
         // await webSocketHandler(wss)
     } catch (error) {

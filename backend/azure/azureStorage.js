@@ -9,4 +9,11 @@ const blobServiceClient = new BlobServiceClient(
     new DefaultAzureCredential()
 );
 
+function blobServiceClientCC() {
+    const a = blobServiceClient.findBlobsByTags("serviceId", "userAddr");
+    return console.log(a);
+}
+
+blobServiceClientCC();
+
 module.exports = blobServiceClient;
