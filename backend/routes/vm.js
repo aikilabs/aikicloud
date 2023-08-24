@@ -1,7 +1,7 @@
-const router  = require('express').Router();
+const router = require("express").Router();
 
-const {createVm } = require('../controller/vm');
+const { createVm, getVmDomain, stopVm } = require("../controller/vm");
 
-router.post('/create', createVm);
+router.route("/").get(getVmDomain).post(createVm).delete(stopVm);
 
 module.exports = router;

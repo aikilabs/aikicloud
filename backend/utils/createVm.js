@@ -11,6 +11,8 @@ const { generateRandomString } = require("./generateRandomString");
 const { BadRequestError } = require("../errors");
 require("dotenv").config();
 const path = require("path");
+const { stat } = require("fs");
+const cron = require("node-cron");
 
 const createAzureVm = async (serviceId, userAddr, duration, keyPair) => {
     // Store function output to be used elsewhere
@@ -141,10 +143,14 @@ const createAzureVm = async (serviceId, userAddr, duration, keyPair) => {
                 domainNameLabel: domainNameLabel,
             },
         };
-        return await networkClient.publicIPAddresses.beginCreateOrUpdateAndWait(
+        await networkClient.publicIPAddresses.beginCreateOrUpdateAndWait(
             resourceGroupName,
             publicIPName,
             publicIPParameters
+        );
+        return await networkClient.publicIPAddresses.get(
+            resourceGroupName,
+            publicIPName
         );
     }
 
@@ -259,17 +265,18 @@ const createAzureVm = async (serviceId, userAddr, duration, keyPair) => {
                 ],
             },
         };
-        console.log("6.Creating Virtual Machine: " + vmName);
-        console.log(
-            " VM create parameters: " +
-                util.inspect(vmParameters, { depth: null })
-        );
+        // console.log("6.Creating Virtual Machine: " + vmName);
+        // console.log(
+        //     " VM create parameters: " +
+        //         util.inspect(vmParameters, { depth: null })
+        // );
         const resCreate =
             await computeClient.virtualMachines.beginCreateOrUpdateAndWait(
                 resourceGroupName,
                 vmName,
                 vmParameters
             );
+
         return await computeClient.virtualMachines.get(
             resourceGroupName,
             vmName
@@ -287,15 +294,12 @@ const createAzureVm = async (serviceId, userAddr, duration, keyPair) => {
         return newNumber;
     };
     //Random number generator for service names and settings
-    const resourceGroupName = _generateRandomId(
-        `${yourAlias}-testrg`,
-        randomIds
-    );
-    const vmName = _generateRandomId(`${yourAlias}vm`, randomIds);
+    const resourceGroupName = `${serviceId + userAddr}-testrg`;
+    const vmName = `${serviceId + userAddr}vm`;
     const storageAccountName = _generateRandomId(`${yourAlias}ac`, randomIds);
     const vnetName = _generateRandomId(`${yourAlias}vnet`, randomIds);
     const subnetName = _generateRandomId(`${yourAlias}subnet`, randomIds);
-    const publicIPName = _generateRandomId(`${yourAlias}pip`, randomIds);
+    const publicIPName = `${serviceId + userAddr}-pip`;
     const networkInterfaceName = _generateRandomId(
         `${yourAlias}nic`,
         randomIds
@@ -322,10 +326,21 @@ const createAzureVm = async (serviceId, userAddr, duration, keyPair) => {
                 nicInfo.id
                 // vmImageInfo[0].name
             );
+            console.log(publicIPInfo);
+            console.log(vmInfo);
+
             return;
         } catch (err) {
             console.log(err);
-            throw new BadRequestError("Failed to create resources.");
+            const resourceClient = new ResourceManagementClient(
+                credentials,
+                subscriptionId
+            );
+
+            const result = await resourceClient.resourceGroups.beginDelete(
+                resourceGroupName
+            );
+            console.log(JSON.stringify(result));
         }
     }
 
@@ -338,8 +353,32 @@ const createAzureVm = async (serviceId, userAddr, duration, keyPair) => {
             console.log(
                 `success - resource group name: ${resourceGroupName}, vm resource name: ${vmName}`
             );
+            setTimeout(async () => {
+                try {
+                    const resourceClient = new ResourceManagementClient(
+                        credentials,
+                        subscriptionId
+                    );
+
+                    const result =
+                        await resourceClient.resourceGroups.beginDelete(
+                            resourceGroupName
+                        );
+                    console.log(JSON.stringify(result));
+                } catch (error) {
+                    console.log(error);
+                }
+            }, duration * 1000);
         })
-        .catch((err) => {
+        .catch(async (err) => {
+            const resourceClient = new ResourceManagementClient(
+                credentials,
+                subscriptionId
+            );
+
+            const result = await resourceClient.resourceGroups.beginDelete(
+                resourceGroupName
+            );
             console.log(err);
         });
 };
