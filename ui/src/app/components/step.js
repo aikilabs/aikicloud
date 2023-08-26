@@ -10,7 +10,7 @@ const Step = ({ step, title, description }) => {
       whileInView={{ y: "0px", opacity: 1 }}
       // viewport={{ once: true }}
       transition={{ duration: 1 }}
-      className={`flex h-full w-full max-w-sm flex-col gap-y-4 rounded-lg bg-gradient-to-t from-black via-black to-[#774264]/50 p-6 text-hometext lg:max-w-md ${
+      className={`flex h-full w-full max-w-sm flex-col gap-y-4 rounded-lg bg-gragra p-6 text-hometext lg:max-w-md ${
         step == 3 && "md:col-span-2 xl:col-span-1"
       }`}
     >

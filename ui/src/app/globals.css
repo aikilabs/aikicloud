@@ -2,3 +2,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+
+   .clip-box {
+
+       clip-path: polygon(75% 0, 100% 20%, 100% 100%, 0 100%, 0 0);
+
+   }
+
+}
