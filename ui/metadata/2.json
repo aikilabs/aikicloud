@@ -1,0 +1,8 @@
+{
+    "name": "GCP cloud VM instance",
+    "description": "GCP cloud VM instance",
+    "image": "https://ipfs.io/ipfs/QmS8aqiSqaRi5MhekksGYP7AMt5Q1ZADyfmrQDTKV6UGUj/gcp.png",
+    "properties": {
+        "cost": "0.1 USD/hour"
+    }
+}
