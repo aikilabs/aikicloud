@@ -41,3 +41,10 @@ next-env.d.ts
 
 # env files
 **/*env
+
+# tenderly
+# Dependency directories
+node_modules/
+
+# Ignore tsc output
+tenderly_actions/actions/out/**/*
