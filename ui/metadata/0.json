@@ -1,0 +1,8 @@
+{
+    "name": "Azure cloud VM instance",
+    "description": "Azure cloud VM instance",
+    "image": "https://ipfs.io/ipfs/QmS8aqiSqaRi5MhekksGYP7AMt5Q1ZADyfmrQDTKV6UGUj/azure.png",
+    "properties": {
+        "cost": "0.1 USD/hour"
+    }
+}

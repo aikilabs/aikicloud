@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
+import "openzeppelin-contracts/utils/Strings.sol";
 import "./IERC20.sol";
 import {IERC4907X} from "./IERC4907.sol";
 
@@ -61,15 +62,14 @@ contract RentalNFT is ERC1155, IERC4907X {
 
     /// RentalNFT: CONSTRUCTOR
     /// @param _admin  The admin account
-    /// @param _uri  The base URI for the token
+    // @param _uri  The base URI for the token
     /// @param _services  The supported services
     /// @param _tokens  The supported fee tokens
     constructor(
         address _admin,
-        string memory _uri,
         IERC20[] memory _tokens,
         IERC4907X.ServiceInfo[] memory _services
-    ) ERC1155(_uri) {
+    ) ERC1155("https://ipfs.io/ipfs/QmQgbfUoQwzxAD5VyZBFsffqqVUUNMUy6mMW2YjSRSGLF8/{id}.json") {
 
         admin = _admin;
 
@@ -200,6 +200,25 @@ contract RentalNFT is ERC1155, IERC4907X {
         emit ServiceStopped(serviceId_, msg.sender, 0);
 
         ended_ = true;
+    }
+
+    /// @dev set the base URI for the token
+    function setURI(string memory newURI_) external onlyAdmin {
+        _setURI(newURI_);
+    }
+
+    function uri(uint256 _tokenID) public pure override returns(string memory) {
+        return string(
+            abi.encodePacked(
+                "https://ipfs.io/ipfs/QmQgbfUoQwzxAD5VyZBFsffqqVUUNMUy6mMW2YjSRSGLF8/",
+                Strings.toString(_tokenID),
+                ".json"
+            )
+        );
+    }
+
+    function contractURI() public pure returns(string memory) {
+        return "https://ipfs.io/ipfs/QmQgbfUoQwzxAD5VyZBFsffqqVUUNMUy6mMW2YjSRSGLF8/collection.json";
     }
 
     /// @dev add support for a new fee token

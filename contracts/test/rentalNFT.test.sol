@@ -57,7 +57,7 @@ contract RentalNFTTest is Test {
         tokens[0] = IERC20(address(_token1));
         tokens[1] = IERC20(address(_token2));
 
-        _rentalNFT = new RentalNFT(_alice, "", tokens, serviceInfo);
+        _rentalNFT = new RentalNFT(_alice, tokens, serviceInfo);
 
 
 

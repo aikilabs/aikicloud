@@ -1,0 +1,8 @@
+{
+    "name": "AWS cloud EC2 instance",
+    "description": "AWS cloud EC2 instance",
+    "image": "https://ipfs.io/ipfs/QmS8aqiSqaRi5MhekksGYP7AMt5Q1ZADyfmrQDTKV6UGUj/aws.png",
+    "properties": {
+        "cost": "0.1 USD/hour"
+    }
+}
