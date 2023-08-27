@@ -25,31 +25,19 @@ const Hero = () => {
       style={{ opacity }}
       className="sticky top-0 flex h-screen flex-col bg-[url(/nebula.jpg)] bg-cover bg-left "
     >
-      <nav className="flex justify-between border-b border-gray-200/20 px-8 py-6">
-        {" "}
-        <Image
-          className="h-8"
-          src="/logo.svg"
-          width="152"
-          height="34"
-          alt="logo of aikicloud"
-        />
-        <button className="rounded border-2 px-4 py-1 font-semibold text-hometext">
-          Connect Wallet
-        </button>
-      </nav>
+     
       <motion.article
         initial={{ y: "100px", opacity: 0 }}
         animate={{ y: "0px", opacity: 1 }}
         transition={{ delay: 0.5, duration: 1 }}
         style={{ opacity, translateY: y }}
-        className="flex h-full flex-col items-center justify-center gap-y-20 px-2 text-center sm:px-20 lg:w-1/2 lg:items-start lg:text-left"
+        className="flex h-full flex-col items-center justify-center gap-y-12 px-2 text-center sm:px-20 "
       >
-        <h1 className="via-hometex flex flex-col bg-gradient-to-r from-hometext to-[#774264] bg-clip-text text-3xl font-[900] text-hometext text-transparent lg:text-5xl">
+        <h1 className="flex max-w-2xl text-center flex-col text-3xl font-bold text-hometext md:text-5xl">
           <span>Unleash Your Potential:</span> Rent Cloud Services, Fuel Your
           Success
         </h1>
-        <button className="w-40 rounded bg-primary py-2 text-hometext">
+        <button className="px-6 text-sm rounded bg-primary py-2 text-hometext">
           View Litepaper
         </button>
       </motion.article>

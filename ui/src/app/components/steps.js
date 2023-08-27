@@ -15,17 +15,17 @@ const Steps = () => {
     },
     {
       title: "Step 3",
-      description: "Lift off ",
+      description: "Lift off! WAGMI ",
       number: 3,
     },
   ];
   return (
     <section className="relative z-10 flex flex-col gap-12 overflow-hidden bg-black py-12">
-      <div className="flex w-full flex-col px-4">
+      <div className="flex w-full flex-col gap-y-3 px-4">
         <h1 className="text-center text-4xl font-extrabold capitalize text-hometext">
-          How to use
+          How it Works
         </h1>
-        <p className="text-center text-sm text-hometext/80 sm:text-lg">
+        <p className="text-center text-sm text-hometext/60 sm:text-base">
           Streamlined Process: Turning Cloud Service Rental into Simplicity
         </p>
       </div>
