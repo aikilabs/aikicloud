@@ -3,18 +3,18 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const Service = ({ image, name, type, price }) => {
+const Service = ({ image, name, type, price,id }) => {
   const router = useRouter();
   return (
     <div
-      onClick={() => router.push(`/services/${name}`)}
+      onClick={() => router.push(`/services/${id}`)}
       className="clip-box flex h-[292px] w-[262px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary md:h-[358px] md:w-[294px]"
     >
       <div className=" clip-box flex h-72 w-64 flex-col overflow-hidden rounded-lg  md:h-[22rem] md:w-[18rem]">
         <Image
-          src={image}
+          src={image || "/starsHome.svg"}
           className="basis-[75%] object-cover"
-          alt={name}
+          alt={name || "placeholder"}
           width={6000}
           height={6000}
           priority
@@ -34,7 +34,7 @@ const Service = ({ image, name, type, price }) => {
           <p className="text-lg">{name}</p>
           <div className="flex justify-between">
             <h4 className="text-xs text-white/70">Price</h4>
-            <h5 className="text-xs">{price}</h5>
+            <h5 className="text-xs font-semibold">${price} USD/hour</h5>
           </div>
         </div>
       </div>

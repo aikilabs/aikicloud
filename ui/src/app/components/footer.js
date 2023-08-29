@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React from "react";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 
 const Footer = () => {
   const logo = [
@@ -21,6 +21,7 @@ const Footer = () => {
           <div className="flex w-full flex-wrap items-center justify-between gap-x-8 ">
             {logo.map((logo, index) => (
               <Image
+              key={index + logo}
                 className={`${index == 1 ? "w-20 md:w-32" : "w-8 md:w-20"} `}
                 src={logo}
                 height={`${index == 1 ? "188" : "100"}`}

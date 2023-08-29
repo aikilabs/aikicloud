@@ -11,17 +11,29 @@ const { ComputeManagementClient } = require("@azure/arm-compute");
 const { ResourceManagementClient } = require("@azure/arm-resources");
 const { NetworkManagementClient } = require("@azure/arm-network");
 require("dotenv").config();
-const virtualMachineServiceId = "vm";
+const virtualMachineServiceId = 0;
+const { ethers } = require("ethers");
+const checkIfMinted = require("../utils/checkIfMinted");
 
 const createVm = async (req, res) => {
     const { serviceId, userAddr, duration } = req.body;
 
-    if (serviceId == null || userAddr == null || duration == null) {
+    if (
+        serviceId == null ||
+        userAddr == null ||
+        duration == null
+    ) {
         throw new BadRequestError("Missing required fields");
     }
 
-    if (serviceId !== virtualMachineServiceId) {
-        throw new BadRequestError("Invalid serviceId");
+    // if (serviceId != virtualMachineServiceId) {
+    //     throw new BadRequestError("Invalid serviceId");
+    // }
+
+    const isMinted = await checkIfMinted(0, userAddr);
+
+    if (!isMinted) {
+        throw new BadRequestError("User has not minted NFT");
     }
 
     // Step 1: Generate SSH Key Pair
