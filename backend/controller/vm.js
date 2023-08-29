@@ -16,7 +16,7 @@ const { ethers } = require("ethers");
 const checkIfMinted = require("../utils/checkIfMinted");
 
 const createVm = async (req, res) => {
-    const { serviceId, userAddr, duration } = req.body;
+    let { serviceId, userAddr, duration } = req.body;
 
     if (
         serviceId == null ||
@@ -29,6 +29,10 @@ const createVm = async (req, res) => {
     // if (serviceId != virtualMachineServiceId) {
     //     throw new BadRequestError("Invalid serviceId");
     // }
+
+    if (serviceId == 0) {
+        serviceId = "vm";
+    }
 
     const isMinted = await checkIfMinted(0, userAddr);
 

@@ -31,14 +31,32 @@ const MintButton = ({ hours, amount, id, address }) => {
     onSuccess(data) {
       const getSSH = async () => {
         try {
-          const { data } = await axios.post(
+          const response = await axios.post(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}vm`,
             {
               serviceId: id,
               userAddr: address,
               duration: hours * 60 * 60,
             },
+            {
+              responseType: "blob",
+            },
           );
+          const blob = new Blob([response.data], {
+            type: "application/x-pem-file",
+          });
+
+          // Create a URL for the blob
+          const blobUrl = window?.URL.createObjectURL(blob);
+
+          // Create a link and click it to initiate the download
+          const link = document.createElement("a");
+          link.href = blobUrl;
+          link.download = "private_key.pem";
+          link.click();
+
+          // Clean up the blob URL after the download
+          window?.URL.revokeObjectURL(blobUrl);
           console.log(data);
         } catch (error) {
           console.log(error);
