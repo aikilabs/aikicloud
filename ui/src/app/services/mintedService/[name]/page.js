@@ -1,18 +1,48 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Service from "./components/service";
 import Details from "./components/details";
-import { rentalNFTAbi } from "../../../../abi/rentalNFTAbi";
+import { rentalNFTAbi } from "../../../../../abi/rentalNFTAbi";
 import { useContractRead } from "wagmi";
 import { useDispatch, useSelector } from "react-redux";
 import { useAccount } from "wagmi";
 import { usePathname } from "next/navigation";
+import axios from "axios";
 
 const Page = () => {
   const { isConnected, address } = useAccount();
   const [loading, setLoading] = useState(true);
   const [service, setService] = useState({});
   const pathName = usePathname();
+  const [vmDetails, setVmDetails] = useState({});
+
+  useEffect(() => {
+    console.log(address);
+    const getVmDetails = async () => {
+      try {
+        let data = {
+          userAddr: address,
+        };
+
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}vm`,
+          {
+            params: data,
+          },
+        );
+        console.log(res.data);
+        setVmDetails(res.data);
+      } catch (error) {
+        alert(
+          "Error getting VM details,this might be due to your instance is being created or destroyed, try again later",
+        );
+        console.log(error);
+      }
+    };
+    if (isConnected && address) {
+      getVmDetails();
+    }
+  }, []);
 
   // const service = {
   //   image: "/nebula.jpg",
@@ -37,7 +67,7 @@ const Page = () => {
     functionName: "uri",
     args: [
       //  get id from current url /service/[id]
-      pathName.split("/")[2],
+      pathName.split("/")[3],
     ],
     onSuccess(data) {
       setLoading(true);
@@ -58,7 +88,7 @@ const Page = () => {
     functionName: "services",
     args: [
       //  get id from current url /service/[id]
-      pathName.split("/")[2],
+      pathName.split("/")[3],
     ],
     onSuccess(data) {
       setLoading(true);
@@ -84,15 +114,12 @@ const Page = () => {
             Service Details:
           </h1>
           <div className="flex w-full max-w-2xl flex-col gap-8 md:flex-row">
-            <Details
-              {...service}
-              cost={service.properties?.cost}
-              address={address}
-              id={pathName.split("/")[2]}
-            />
+            {vmDetails.dns && <Details
+              connectionString={`ssh -i <pem_file> ${vmDetails?.username}@${vmDetails?.dns}`}
+            />}
             {service && (
               <Service
-                id={pathName.split("/")[2]}
+                id={pathName.split("/")[3]}
                 name={service.description}
                 type={service.name}
                 price={Number(service.amount) / 10 ** 18}

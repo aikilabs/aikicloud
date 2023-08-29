@@ -18,11 +18,7 @@ const checkIfMinted = require("../utils/checkIfMinted");
 const createVm = async (req, res) => {
     let { serviceId, userAddr, duration } = req.body;
 
-    if (
-        serviceId == null ||
-        userAddr == null ||
-        duration == null
-    ) {
+    if (serviceId == null || userAddr == null || duration == null) {
         throw new BadRequestError("Missing required fields");
     }
 
@@ -84,7 +80,7 @@ const getVmDomain = async (req, res) => {
     const secret = process.env.AZURE_CLIENT_SECRET;
     const subscriptionId = process.env.AZURE_SUBSCRIPTION_ID;
 
-    const { serviceId, userAddr } = req.body;
+    const { serviceId, userAddr } = req.query;
 
     let credentials = null;
     credentials = new ClientSecretCredential(tenantId, clientId, secret);
@@ -99,12 +95,12 @@ const getVmDomain = async (req, res) => {
     );
     try {
         const { dnsSettings } = await networkClient.publicIPAddresses.get(
-            `${serviceId + userAddr}-testrg`,
-            `${serviceId + userAddr}-pip`
+            `${"vm" + userAddr}-testrg`,
+            `${"vm" + userAddr}-pip`
         );
         const { osProfile } = await computeClient.virtualMachines.get(
-            `${serviceId + userAddr}-testrg`,
-            `${serviceId + userAddr}vm`
+            `${"vm" + userAddr}-testrg`,
+            `${"vm" + userAddr}vm`
         );
 
         res.json({ dns: dnsSettings.fqdn, username: osProfile.adminUsername });

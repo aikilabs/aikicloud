@@ -1,6 +1,7 @@
 import React from "react";
 import Service from "./service";
 import { useDispatch, useSelector } from "react-redux";
+import MintedService from "./mintedService";
 
 const MintedServices = () => {
   const mintedServices = useSelector((state) => state.aikiCloud.mintedServices);
@@ -33,7 +34,7 @@ const MintedServices = () => {
       {mintedServices.length > 0 ? (
         <div className="grid place-items-center gap-24 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {mintedServices?.map((service, index) => (
-            <Service
+            <MintedService
               key={index + service.name}
               id={index}
               name={service.description}

@@ -8,7 +8,9 @@ import {
   useContractRead,
 } from "wagmi";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 const MintButton = ({ hours, amount, id, address }) => {
+  const router = useRouter();
   const { config } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: rentalNFTAbi,
@@ -58,6 +60,7 @@ const MintButton = ({ hours, amount, id, address }) => {
           // Clean up the blob URL after the download
           window?.URL.revokeObjectURL(blobUrl);
           console.log(data);
+          router.push(`/services/mintedService/${id}`);
         } catch (error) {
           console.log(error);
         }

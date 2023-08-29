@@ -126,11 +126,11 @@ const Page = () => {
       // const unMintedService = services.filter(
       //   (service, index) => !mintedServiceCount.includes(index),
       // );
-      const mintedService = services.filter((service, index) =>
-        mintedServiceCount[index] > 0
+      const mintedService = services.filter(
+        (service, index) => mintedServiceCount[index] > 0,
       );
       const unMintedService = services.filter(
-        (service, index) => mintedServiceCount[index] <= 0
+        (service, index) => mintedServiceCount[index] <= 0,
       );
 
       console.log(unMintedService);
@@ -139,6 +139,28 @@ const Page = () => {
     }
     setLoading(false);
   }, [mintedServiceCount]);
+   useEffect(() => {
+     setLoading(true);
+     if (services.length > 0) {
+       // const mintedService = services.filter((service, index) =>
+       //   mintedServiceCount.includes(index),
+       // );
+       // const unMintedService = services.filter(
+       //   (service, index) => !mintedServiceCount.includes(index),
+       // );
+       const mintedService = services.filter(
+         (service, index) => mintedServiceCount[index] > 0,
+       );
+       const unMintedService = services.filter(
+         (service, index) => mintedServiceCount[index] <= 0,
+       );
+
+       console.log(unMintedService);
+       dispatch(setServices(unMintedService));
+       dispatch(setMintedServices(mintedService));
+     }
+     setLoading(false);
+   }, []);
 
   return (
     <>
