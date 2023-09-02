@@ -11,17 +11,29 @@ const { ComputeManagementClient } = require("@azure/arm-compute");
 const { ResourceManagementClient } = require("@azure/arm-resources");
 const { NetworkManagementClient } = require("@azure/arm-network");
 require("dotenv").config();
-const virtualMachineServiceId = "vm";
+const virtualMachineServiceId = 0;
+const { ethers } = require("ethers");
+const checkIfMinted = require("../utils/checkIfMinted");
 
 const createVm = async (req, res) => {
-    const { serviceId, userAddr, duration } = req.body;
+    let { serviceId, userAddr, duration } = req.body;
 
     if (serviceId == null || userAddr == null || duration == null) {
         throw new BadRequestError("Missing required fields");
     }
 
-    if (serviceId !== virtualMachineServiceId) {
-        throw new BadRequestError("Invalid serviceId");
+    // if (serviceId != virtualMachineServiceId) {
+    //     throw new BadRequestError("Invalid serviceId");
+    // }
+
+    if (serviceId == 0) {
+        serviceId = "vm";
+    }
+
+    const isMinted = await checkIfMinted(0, userAddr);
+
+    if (!isMinted) {
+        throw new BadRequestError("User has not minted NFT");
     }
 
     // Step 1: Generate SSH Key Pair
@@ -68,7 +80,7 @@ const getVmDomain = async (req, res) => {
     const secret = process.env.AZURE_CLIENT_SECRET;
     const subscriptionId = process.env.AZURE_SUBSCRIPTION_ID;
 
-    const { serviceId, userAddr } = req.body;
+    const { serviceId, userAddr } = req.query;
 
     let credentials = null;
     credentials = new ClientSecretCredential(tenantId, clientId, secret);
@@ -83,12 +95,12 @@ const getVmDomain = async (req, res) => {
     );
     try {
         const { dnsSettings } = await networkClient.publicIPAddresses.get(
-            `${serviceId + userAddr}-testrg`,
-            `${serviceId + userAddr}-pip`
+            `${"vm" + userAddr}-testrg`,
+            `${"vm" + userAddr}-pip`
         );
         const { osProfile } = await computeClient.virtualMachines.get(
-            `${serviceId + userAddr}-testrg`,
-            `${serviceId + userAddr}vm`
+            `${"vm" + userAddr}-testrg`,
+            `${"vm" + userAddr}vm`
         );
 
         res.json({ dns: dnsSettings.fqdn, username: osProfile.adminUsername });

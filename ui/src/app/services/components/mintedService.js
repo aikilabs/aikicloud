@@ -3,11 +3,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const Service = ({ image, name, type, price,id }) => {
+const MintedService = ({ image, name, type, price, id }) => {
   const router = useRouter();
   return (
     <div
-      onClick={() => router.push(`/services/${id}`)}
+      onClick={() => router.push(`/services/mintedService/${id}`)}
       className="clip-box flex h-[292px] w-[262px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary md:h-[358px] md:w-[294px]"
     >
       <div className=" clip-box flex h-72 w-64 flex-col overflow-hidden rounded-lg  md:h-[22rem] md:w-[18rem]">
@@ -42,4 +42,4 @@ const Service = ({ image, name, type, price,id }) => {
   );
 };
 
-export default Service;
+export default MintedService;

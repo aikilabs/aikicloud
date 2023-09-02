@@ -7,7 +7,6 @@ const Service = ({ image, name, type, price,id }) => {
   const router = useRouter();
   return (
     <div
-      onClick={() => router.push(`/services/${id}`)}
       className="clip-box flex h-[292px] w-[262px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary md:h-[358px] md:w-[294px]"
     >
       <div className=" clip-box flex h-72 w-64 flex-col overflow-hidden rounded-lg  md:h-[22rem] md:w-[18rem]">
