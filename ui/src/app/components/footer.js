@@ -9,6 +9,7 @@ const Footer = () => {
     "celoLogo.svg",
     "gcpLogo.svg",
     "walletConnetLogo.svg",
+    "arbitrumArbLogo.svg",
   ];
 
   return (
