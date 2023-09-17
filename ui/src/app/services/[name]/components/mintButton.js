@@ -17,7 +17,7 @@ const MintButton = ({ hours, amount, id, address }) => {
     functionName: "rentService",
     args: [
       id,
-      "0x0FA8781a83E46826621b3BC094Ea2A0212e71B23",
+      "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
       hours * (amount * 10 ** 6),
     ],
   });
