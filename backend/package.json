@@ -2,7 +2,7 @@
     "name": "@aikicloud/backend",
     "version": "1.0.0",
     "scripts": {
-        "start-api": "node ./app.js",
+        "start": "node start app.js",
         "dev": "nodemon app.js"
     },
     "dependencies": {
