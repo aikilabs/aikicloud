@@ -14,20 +14,6 @@ const Page = () => {
   const [service, setService] = useState({});
   const pathName = usePathname();
 
-  // const service = {
-  //   image: "/nebula.jpg",
-  //   pp: "/nebula.jpg",
-  //   name: "Test Service 3",
-  //   type: "Test Type 3",
-  //   price: "$50.00/hr",
-  //   ram: "1gb",
-  //   storage: "8gb",
-  //   lifeSpan: "2 weeks",
-  //   cpu: "1",
-  //   cloud: "aws",
-  //   address: "0x123456789555555666660",
-  // };
-
   const mlootContract = {
     address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: rentalNFTAbi,

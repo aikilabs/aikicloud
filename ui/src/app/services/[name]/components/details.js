@@ -2,7 +2,10 @@ import Image from "next/image";
 import React from "react";
 import { BsPersonCircle } from "react-icons/bs";
 import MintButton from "./mintButton";
+import { arbitrumAbi } from "../../../../../abi/arbitrumAbi";
+import { useContractRead } from "wagmi";
 import Service from "../../components/service";
+import ApproveButton from "./approveButton";
 
 const Details = ({
   name,
@@ -15,9 +18,23 @@ const Details = ({
   cloud,
   amount,
   cost,
-  id
+  id,
 }) => {
   const [hours, setHours] = React.useState(1);
+  const [allowanceNo, setAllowanceNo] = React.useState(0);
+
+  const usdcContract = {
+    address: process.env.NEXT_PUBLIC_SPENDING_ADDRESS,
+    abi: arbitrumAbi,
+  };
+  const getAllowance = useContractRead({
+    ...usdcContract,
+    functionName: "allowance",
+    args: [address, process.env.NEXT_PUBLIC_CONTRACT_ADDRESS],
+    onSuccess(data) {
+      setAllowanceNo(data);
+    },
+  });
   React.useEffect(() => {
     if (hours < 1) {
       setHours(1);
@@ -48,7 +65,27 @@ const Details = ({
           className="w-min rounded-md bg-white px-2 py-2 text-base text-black"
         />
       </div>
-      <MintButton hours={hours} id={id} address={address} amount={Number(amount) / 10 ** 18} />
+      {hours * (Number(amount) * 10 ** 6) >= Number(allowanceNo) ? (
+        <ApproveButton
+          hours={hours}
+          id={id}
+          address={address}
+          amount={Number(amount) / 10 ** 18}
+        />
+      ) : (
+        <MintButton
+          hours={hours}
+          id={id}
+          address={address}
+          amount={Number(amount) / 10 ** 18}
+        />
+      )}
+      {/* <MintButton
+        hours={hours}
+        id={id}
+        address={address}
+        amount={Number(amount) / 10 ** 18}
+      /> */}
       {/* <h3>Storage: {storage}</h3>
       <h3>Life Span: {lifeSpan}</h3>
       <h3>CPU: {cpu}</h3>
