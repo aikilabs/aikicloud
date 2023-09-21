@@ -65,7 +65,7 @@ const Details = ({
           className="w-min rounded-md bg-white px-2 py-2 text-base text-black"
         />
       </div>
-      {hours * (Number(amount) * 10 ** 6) > Number(allowanceNo) ? (
+      {hours * (Number(amount) * 10 ** 6) >= Number(allowanceNo) ? (
         <ApproveButton
           hours={hours}
           id={id}
