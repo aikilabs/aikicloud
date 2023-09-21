@@ -3,7 +3,7 @@ import "./globals.css";
 import React from "react";
 import { configureChains, createConfig, WagmiConfig, useNetwork } from "wagmi";
 import {
-  // arbitrum,
+  arbitrum,
   // arbitrumGoerli,
   // avalanche,
   // avalancheFuji,
@@ -35,7 +35,7 @@ const Moralis = require("moralis").default;
 
 const { chains, publicClient } = configureChains(
   [
-    // arbitrum,
+    arbitrum,
     // // arbitrumGoerli,
     // avalanche,
     // // avalancheFuji,
@@ -46,7 +46,7 @@ const { chains, publicClient } = configureChains(
     // fantom,
     // // fantomTestnet,
     // goerli,
-    polygonMumbai,
+    // polygonMumbai,
     // // optimism,
     // polygon,
     // sepolia,
